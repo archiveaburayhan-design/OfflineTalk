@@ -38,6 +38,19 @@ object Hub {
 
     // ---------- আবিষ্কার ও সংযোগ ----------
     fun start() {
+    stop()
+    val strategy = Strategy.P2P_CLUSTER
+    client.startAdvertising(myName, SERVICE, lifecycle,
+        AdvertisingOptions.Builder().setStrategy(strategy).build())
+        .addOnFailureListener { status.value = "Advertise ত্রুটি: ${it.message}" }
+    client.startDiscovery(SERVICE, object : EndpointDiscoveryCallback() {
+        override fun onEndpointFound(id: String, i: DiscoveredEndpointInfo) { found[id] = i.endpointName }
+        override fun onEndpointLost(id: String) { found.remove(id) }
+    }, DiscoveryOptions.Builder().setStrategy(strategy).build())
+        .addOnSuccessListener { status.value = "খুঁজছে..." }
+        .addOnFailureListener { status.value = "Discovery ত্রুটি: ${it.message}" }
+    }
+    fun startOld() {
         val strategy = Strategy.P2P_CLUSTER
         client.startAdvertising(myName, SERVICE, lifecycle,
             AdvertisingOptions.Builder().setStrategy(strategy).build())
