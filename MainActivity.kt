@@ -66,7 +66,10 @@ class MainActivity : ComponentActivity() {
             l += listOf(Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_ADVERTISE,
                 Manifest.permission.BLUETOOTH_CONNECT)
         }
-        if (Build.VERSION.SDK_INT <= 32) l += Manifest.permission.ACCESS_FINE_LOCATION
+        if (Build.VERSION.SDK_INT <= 32) {
+    l += Manifest.permission.ACCESS_FINE_LOCATION
+    l += Manifest.permission.ACCESS_COARSE_LOCATION
+        }
         if (Build.VERSION.SDK_INT >= 33) l += Manifest.permission.NEARBY_WIFI_DEVICES
         return l.toTypedArray()
     }
@@ -154,7 +157,7 @@ class MainActivity : ComponentActivity() {
                         modifier = Modifier.weight(1f).padding(vertical = 14.dp),
                         decorationBox = { inner ->
                             Box {
-                                if (text.isEmpty()) Text("মেসেজ লিখুন…", color = TextSub, fontSize = 16.sp)
+                                if (text.isEmpty()) Text("type massage…", color = TextSub, fontSize = 16.sp)
                                 inner()
                             }
                         }
@@ -171,7 +174,7 @@ class MainActivity : ComponentActivity() {
     private fun openFile(f: java.io.File) {
         val uri = FileProvider.getUriForFile(this, "$packageName.provider", f)
         startActivity(Intent.createChooser(Intent(Intent.ACTION_VIEW).setData(uri)
-            .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION), "খুলুন"))
+            .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION), "open"))
     }
 }
 
@@ -191,11 +194,11 @@ private fun Header(running: Boolean, onToggle: () -> Unit) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Box(Modifier.size(8.dp).clip(CircleShape).background(dot))
                 Spacer(Modifier.width(8.dp))
-                Text(status, color = TextSub, fontSize = 13.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(status, color = TextSub, fontSize = 13.sp, maxLines = 3, overflow = TextOverflow.Ellipsis)
             }
         }
         Spacer(Modifier.width(12.dp))
-        if (running) PillButton("■  বন্ধ", false, onToggle) else PillButton("▶  শুরু", true, onToggle)
+        if (running) PillButton("■  stop", false, onToggle) else PillButton("▶  start", true, onToggle)
     }
 }
 
@@ -216,7 +219,7 @@ private fun PillButton(text: String, filled: Boolean, onClick: () -> Unit) {
 
 @Composable
 private fun BottomBar(sel: Int, onSel: (Int) -> Unit) {
-    val items = listOf("📡" to "ডিভাইস", "💬" to "চ্যাট", "🎙️" to "টক")
+    val items = listOf("📡" to "Device", "💬" to "Chat", "🎙️" to "Talk")
     Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 10.dp)
         .clip(RoundedCornerShape(28.dp)).background(Surf).padding(6.dp)) {
         items.forEachIndexed { i, item ->
