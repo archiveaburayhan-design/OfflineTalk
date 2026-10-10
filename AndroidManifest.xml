@@ -16,7 +16,8 @@
 
     <application
         android:allowBackup="false"
-        android:label="OfflineTalk"
+        android:label="FCommun"
+        android:icon="@mipmap/ic_launcher"
         android:theme="@style/Theme.AppCompat.DayNight.NoActionBar">
         <provider
             android:name="androidx.core.content.FileProvider"
