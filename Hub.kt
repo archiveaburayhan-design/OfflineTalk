@@ -26,7 +26,7 @@ object Hub {
     val messages = mutableStateListOf<Msg>()
     val found = mutableStateMapOf<String, String>()      // endpointId -> name
     val connected = mutableStateMapOf<String, String>()  // endpointId -> name
-    val status = mutableStateOf("বন্ধ")
+    val status = mutableStateOf("stop")
     val talking = mutableStateOf(false)
 
     private val client get() = Nearby.getConnectionsClient(app)
@@ -42,13 +42,13 @@ object Hub {
     val strategy = Strategy.P2P_CLUSTER
     client.startAdvertising(myName, SERVICE, lifecycle,
         AdvertisingOptions.Builder().setStrategy(strategy).build())
-        .addOnFailureListener { status.value = "Advertise ত্রুটি: ${it.message}" }
+        .addOnFailureListener { status.value = "Advertise error: ${it.message}" }
     client.startDiscovery(SERVICE, object : EndpointDiscoveryCallback() {
         override fun onEndpointFound(id: String, i: DiscoveredEndpointInfo) { found[id] = i.endpointName }
         override fun onEndpointLost(id: String) { found.remove(id) }
     }, DiscoveryOptions.Builder().setStrategy(strategy).build())
-        .addOnSuccessListener { status.value = "খুঁজছে..." }
-        .addOnFailureListener { status.value = "Discovery ত্রুটি: ${it.message}" }
+        .addOnSuccessListener { status.value = "searching..." }
+        .addOnFailureListener { status.value = "Discovery error: ${it.message}" }
     }
     fun startOld() {
         val strategy = Strategy.P2P_CLUSTER
@@ -58,12 +58,12 @@ object Hub {
             override fun onEndpointFound(id: String, i: DiscoveredEndpointInfo) { found[id] = i.endpointName }
             override fun onEndpointLost(id: String) { found.remove(id) }
         }, DiscoveryOptions.Builder().setStrategy(strategy).build())
-        status.value = "খুঁজছে..."
+        status.value = "searching..."
     }
 
     fun stop() {
         client.stopAllEndpoints(); client.stopAdvertising(); client.stopDiscovery()
-        found.clear(); connected.clear(); status.value = "বন্ধ"
+        found.clear(); connected.clear(); status.value = "stop"
     }
 
     fun connect(id: String) { client.requestConnection(myName, id, lifecycle) }
@@ -74,10 +74,10 @@ object Hub {
             found[id] = info.endpointName
         }
         override fun onConnectionResult(id: String, r: ConnectionResolution) {
-            if (r.status.isSuccess) { connected[id] = found[id] ?: id; status.value = "${connected.size} জন সংযুক্ত" }
+            if (r.status.isSuccess) { connected[id] = found[id] ?: id; status.value = "${connected.size} device connected" }
         }
         override fun onDisconnected(id: String) {
-            connected.remove(id); status.value = "${connected.size} জন সংযুক্ত"
+            connected.remove(id); status.value = "${connected.size} device connected"
         }
     }
 
@@ -119,7 +119,7 @@ object Hub {
 
     // ---------- ফাইল (যেকোনো ধরন) ----------
     fun sendFile(uri: Uri) {
-        if (connected.isEmpty()) return
+        if (connected.isEmpty()) { status.value = "Connect device first"; return }
         val cr = app.contentResolver
         val name = cr.query(uri, null, null, null, null)?.use { c ->
             val i = c.getColumnIndex(OpenableColumns.DISPLAY_NAME); if (c.moveToFirst() && i >= 0) c.getString(i) else null
