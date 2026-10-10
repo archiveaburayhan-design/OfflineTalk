@@ -61,18 +61,18 @@ private val Grad = Brush.linearGradient(listOf(C1, C2))
 class MainActivity : ComponentActivity() {
 
     private fun perms(): Array<String> {
-        val l = mutableListOf(Manifest.permission.RECORD_AUDIO)
-        if (Build.VERSION.SDK_INT >= 31) {
-            l += listOf(Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_ADVERTISE,
-                Manifest.permission.BLUETOOTH_CONNECT)
-        }
-        if (Build.VERSION.SDK_INT <= 32) {
-    l += Manifest.permission.ACCESS_FINE_LOCATION
-    l += Manifest.permission.ACCESS_COARSE_LOCATION
-        }
-        if (Build.VERSION.SDK_INT >= 33) l += Manifest.permission.NEARBY_WIFI_DEVICES
-        return l.toTypedArray()
+    val l = mutableListOf(
+        Manifest.permission.RECORD_AUDIO,
+        Manifest.permission.ACCESS_FINE_LOCATION,
+        Manifest.permission.ACCESS_COARSE_LOCATION
+    )
+    if (Build.VERSION.SDK_INT >= 31) {
+        l += listOf(Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_ADVERTISE,
+            Manifest.permission.BLUETOOTH_CONNECT)
     }
+    if (Build.VERSION.SDK_INT >= 33) l += Manifest.permission.NEARBY_WIFI_DEVICES
+    return l.toTypedArray()
+}
 
     override fun onCreate(s: Bundle?) {
         super.onCreate(s)
