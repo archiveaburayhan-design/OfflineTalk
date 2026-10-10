@@ -56,7 +56,9 @@ class MainActivity : ComponentActivity() {
         var tab by remember { mutableIntStateOf(0) }
         var text by remember { mutableStateOf("") }
         val permLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
-            if (it.values.all { ok -> ok }) Hub.start()
+            val denied = it.filterValues { ok -> !ok }.keys
+if (denied.isEmpty()) Hub.start()
+else Hub.status.value = "অনুমতি নেই: " + denied.joinToString { n -> n.substringAfterLast('.') }
         }
         val filePicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
             uri?.let(Hub::sendFile)
