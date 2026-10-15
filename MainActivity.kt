@@ -60,12 +60,14 @@ private val Grad = Brush.linearGradient(listOf(C1, C2))
 
 class MainActivity : ComponentActivity() {
 
-    private fun perms(): Array<String> {
-    val l = mutableListOf(
-        Manifest.permission.RECORD_AUDIO,
-        Manifest.permission.ACCESS_COARSE_LOCATION,
-        Manifest.permission.ACCESS_FINE_LOCATION
-    )
+    private fun perms(): Array<String>
+    if (Build.VERSION.SDK_INT >= 31) {
+        l += listOf(
+            Manifest.permission.LOCATION_SCAN,
+            Manifest.permission.LOCATIOM_ADVERTISE,
+            Manifest.permission.LOCATION_CONNECT
+        )
+    }
     if (Build.VERSION.SDK_INT >= 31) {
         l += listOf(
             Manifest.permission.BLUETOOTH_SCAN,
